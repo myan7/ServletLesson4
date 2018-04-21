@@ -53,6 +53,13 @@ public class Validate extends HttpServlet {
 //			Step3 : create a statement
 			stmt = con.createStatement();
 			
+			
+			// bad query will meet SQL injection.
+			// by writing code like this, we will face a problem called SQL injection, 
+			// which means if you input the password like this "123' or 1='1", whatever you input inside the user name , it will work
+			// the solution to this problem is use another strategy to retrieve data from the database.
+			// don't write username and password in the same query, we first retrieve the username, and retrieve the password from database
+			// then compare the password user input before to the password we retrieved from the database
 			String query = "select * \n" + 
 					"from servletlogin \n" + 
 					"where username = '"+username+"' and password = '"+password+"'"; 
@@ -64,7 +71,7 @@ public class Validate extends HttpServlet {
 			System.out.println("executeQuery");
 			// validate user information if resultset is not null, it means the form get a value from the database
 			System.out.println("resultset.next() is "+resultset);
-			if(resultset!=null)
+			if(resultset!=null) // or resultset.next()
 			{
 				HttpSession session = request.getSession();
 				// the default session time is 30 mins, we can change it by calling this function (second)
