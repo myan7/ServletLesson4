@@ -52,19 +52,64 @@ public class Validate extends HttpServlet {
 			System.out.println("connection established");
 //			Step3 : create a statement
 			stmt = con.createStatement();
-			
+
+/*
+			// bad query will meet SQL injection.
+			// by writing code like this, we will face a problem called SQL injection, 
+			// which means if you input the password like this "123' or 1='1", whatever you input inside the user name , it will work
+			// the solution to this problem is use another strategy to retrieve data from the database.
+			// don't write username and password in the same query, we first retrieve the username, and retrieve the password from database
+			// then compare the password user input before to the password we retrieved from the database
 			String query = "select * \n" + 
 					"from servletlogin \n" + 
 					"where username = '"+username+"' and password = '"+password+"'"; 
-			
-			
 			System.out.println(query);
 			
 			resultset = stmt.executeQuery(query);  // remove the ";" inside the " "
 			System.out.println("executeQuery");
 			// validate user information if resultset is not null, it means the form get a value from the database
 			System.out.println("resultset.next() is "+resultset);
-			if(resultset!=null)
+*/
+			String query = "select password \n" + 
+					"from servletlogin \n" + 
+					"where username = '"+username+"'"; 
+			System.out.println(query);
+			resultset = stmt.executeQuery(query); 
+			System.out.println(resultset);
+//			System.out.println("resultset.next() is "+resultset.next());
+			
+			if(resultset.next())
+			{
+				// which means there is a record at least 
+				String dbpassword = resultset.getString(1);
+				System.out.println(dbpassword);
+				if(dbpassword.equals(password))
+				{
+					//which means user is valid
+					HttpSession session = request.getSession();
+					// the default session time is 30 mins, we can change it by calling this function (second)
+//					session.setMaxInactiveInterval(20);
+					
+					session.setAttribute("username", username);
+					session.setAttribute("password", password);
+					//this sessionId is assigned per browser which means, no matter how many tabs I opened in a sing browser, the session id will be the same
+					String sessionId = session.getId();
+					session.setAttribute("sessionid", sessionId);
+//					response.sendRedirect("welcome?username="+ username+"&&password="+password); 
+					response.sendRedirect("welcome");
+				}
+				else
+				{
+					response.sendRedirect("login?info=invalid user");
+				}
+			}
+			else
+			{
+				// which means the username is invalid
+				response.sendRedirect("login?info=invalid username");
+			}
+/*			
+			if(resultset!=null )
 			{
 				HttpSession session = request.getSession();
 				// the default session time is 30 mins, we can change it by calling this function (second)
@@ -82,6 +127,7 @@ public class Validate extends HttpServlet {
 			{
 				response.sendRedirect("login");
 			}
+			*/
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
