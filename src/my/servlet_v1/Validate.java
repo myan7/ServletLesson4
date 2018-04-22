@@ -18,6 +18,8 @@ import DBUtil.DBUtil;
 
 /**
  * Servlet implementation class Validate
+ * 
+ * you can switch branch to improve, this is the branch master 
  */
 @WebServlet("/validate")
 public class Validate extends HttpServlet {
